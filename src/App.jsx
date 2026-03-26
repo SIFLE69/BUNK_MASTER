@@ -9,6 +9,8 @@ import TimetableEditor from './components/TimetableEditor';
 import LeaveAnalysis from './components/LeaveAnalysis';
 import ShareSync from './components/ShareSync'; // Collaborative Hub v20.0
 
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
+
 const EMPTY_SCHEDULE = {
   Monday: { slot1: [], slot2: [], slot3: [] },
   Tuesday: { slot1: [], slot2: [], slot3: [] },
@@ -91,8 +93,8 @@ const AppContent = ({ token, user, handleLogout }) => {
       setLoading(true);
       const config = { headers: { 'x-auth-token': token } };
       const [subjResp, ttResp] = await Promise.all([
-        axios.get('http://localhost:5000/api/subjects', config),
-        axios.get('http://localhost:5000/api/timetable', config)
+        axios.get(`${API_BASE}/api/subjects`, config),
+        axios.get(`${API_BASE}/api/timetable`, config)
       ]);
       setSubjects(subjResp.data);
       setTimetable(ttResp.data || EMPTY_SCHEDULE);
@@ -107,7 +109,7 @@ const AppContent = ({ token, user, handleLogout }) => {
   const handleAddSubject = async (newSub) => {
     try {
       const config = { headers: { 'x-auth-token': token } };
-      const resp = await axios.post('http://localhost:5000/api/subjects', newSub, config);
+      const resp = await axios.post(`${API_BASE}/api/subjects`, newSub, config);
       setSubjects(prev => [...prev, resp.data]);
     } catch (err) {
       console.error('Write Conflict', err);
@@ -117,7 +119,7 @@ const AppContent = ({ token, user, handleLogout }) => {
   const handleRemoveSubject = async (id) => {
     try {
       const config = { headers: { 'x-auth-token': token } };
-      await axios.delete(`http://localhost:5000/api/subjects/${id}`, config);
+      await axios.delete(`${API_BASE}/api/subjects/${id}`, config);
       setSubjects(prev => prev.filter(s => s._id !== id));
     } catch (err) {
       console.error('Deletion Fault', err);
@@ -127,7 +129,7 @@ const AppContent = ({ token, user, handleLogout }) => {
   const handleUpdateSubject = async (updated) => {
     try {
       const config = { headers: { 'x-auth-token': token } };
-      const resp = await axios.put(`http://localhost:5000/api/subjects/${updated._id}`, updated, config);
+      const resp = await axios.put(`${API_BASE}/api/subjects/${updated._id}`, updated, config);
       setSubjects(prev => prev.map(s => s._id === updated._id ? resp.data : s));
     } catch (err) {
       console.error('Update Fault', err);
@@ -158,7 +160,7 @@ const AppContent = ({ token, user, handleLogout }) => {
   const handleSaveTimetable = async (newTT) => {
     try {
       const config = { headers: { 'x-auth-token': token } };
-      await axios.post('http://localhost:5000/api/timetable', { schedule: newTT }, config);
+      await axios.post(`${API_BASE}/api/timetable`, { schedule: newTT }, config);
       setTimetable(newTT);
     } catch (err) {
       console.error('Schedule Sync Fault', err);
@@ -175,7 +177,7 @@ const AppContent = ({ token, user, handleLogout }) => {
 
       // 2. Add all subjects in parallel
       const addPromises = cleanSubjects.map(sub =>
-        axios.post('http://localhost:5000/api/subjects', sub, config)
+        axios.post(`${API_BASE}/api/subjects`, sub, config)
       );
       const responses = await Promise.all(addPromises);
       setSubjects(prev => [...prev, ...responses.map(r => r.data)]);

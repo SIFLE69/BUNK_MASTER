@@ -137,4 +137,9 @@ app.post('/api/timetable', auth, async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Strategic Payload Ops Server: ONLINE on port ${PORT}`));
+// app.listen(PORT, () => console.log(`Strategic Payload Ops Server: ONLINE on port ${PORT}`));
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => console.log(`Strategic Payload Ops Server: ONLINE on port ${PORT}`));
+}
+
+export default app;

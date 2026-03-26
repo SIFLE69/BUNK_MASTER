@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
+
 const AuthPortal = ({ onAuthSuccess }) => {
     const [isLogin, setIsLogin] = useState(true);
     const [username, setUsername] = useState('');
@@ -15,7 +17,7 @@ const AuthPortal = ({ onAuthSuccess }) => {
 
         try {
             const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-            const resp = await axios.post(`http://localhost:5000${endpoint}`, { username, password });
+            const resp = await axios.post(`${API_BASE}${endpoint}`, { username, password });
 
             localStorage.setItem('x-auth-token', resp.data.token);
             localStorage.setItem('user', JSON.stringify(resp.data.user));
